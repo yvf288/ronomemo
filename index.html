@@ -1,57 +1,13 @@
-function updateIndexHtmlWithNow() {
-  const now = new Date();
-  const formatted = Utilities.formatDate(now, Session.getScriptTimeZone(), 'yyyy/MM/dd HH:mm:ss');
-  const html = `
+
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
-      <title>グラフ一覧</title>
+      <title>?????</title>
     </head>
     <body>
-      <h1>ここにグラフ画像が並ぶ予定だよ！</h1>
-      <p>最終更新: ${formatted}</p>
-      <!-- ここに画像タグなど追加も可能 -->
+      <h1>????????????????</h1>
+      <p>????: 2025/06/14 19:43:35</p>
     </body>
     </html>
-  `;
   
-  const filename = 'index.html';
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-
-  let sha = undefined;
-  try {
-    const getRes = UrlFetchApp.fetch(url, {
-      method: 'get',
-      headers: {
-        Authorization: 'token ' + githubToken
-      },
-      muteHttpExceptions: true
-    });
-    const getJson = JSON.parse(getRes.getContentText());
-    if (getRes.getResponseCode() === 200 && getJson.sha) {
-      sha = getJson.sha;
-    }
-  } catch (e) {
-    Logger.log('index.htmlのSHA取得エラー: ' + e);
-  }
-
-  const payload = {
-    message: 'index.htmlを更新（NOW自動化）',
-    content: Utilities.base64Encode(html),
-    ...(sha && { sha })
-  };
-
-  const options = {
-    method: 'put',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    headers: {
-      Authorization: 'token ' + githubToken
-    },
-    muteHttpExceptions: true
-  };
-
-  const res = UrlFetchApp.fetch(url, options);
-  Logger.log(`index.html updated: ` + res.getResponseCode());
-}
