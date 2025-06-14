@@ -1,42 +1,57 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>グラフ画像一覧</title>
-  <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      padding: 20px;
-      background: #f8f8f8;
-      color: #333;
+function updateIndexHtmlWithNow() {
+  const now = new Date();
+  const formatted = Utilities.formatDate(now, Session.getScriptTimeZone(), 'yyyy/MM/dd HH:mm:ss');
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>グラフ一覧</title>
+    </head>
+    <body>
+      <h1>ここにグラフ画像が並ぶ予定だよ！</h1>
+      <p>最終更新: ${formatted}</p>
+      <!-- ここに画像タグなど追加も可能 -->
+    </body>
+    </html>
+  `;
+  
+  const filename = 'index.html';
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+  let sha = undefined;
+  try {
+    const getRes = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: {
+        Authorization: 'token ' + githubToken
+      },
+      muteHttpExceptions: true
+    });
+    const getJson = JSON.parse(getRes.getContentText());
+    if (getRes.getResponseCode() === 200 && getJson.sha) {
+      sha = getJson.sha;
     }
-    h1 {
-      text-align: center;
-    }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-    .gallery img {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: white;
-      padding: 5px;
-    }
-  </style>
-</head>
-<body>
-  <h1>最新グラフ画像コレクション（シート2編）</h1>
-  <div class="gallery">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart0.png" alt="chart0">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart1.png" alt="chart1">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart2.png" alt="chart2">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart3.png" alt="chart3">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart4.png" alt="chart4">
-    <img src="https://yvf288.github.io/ronomemo/シート2_chart5.png" alt="chart5">
-  </div>
-</body>
-</html>
+  } catch (e) {
+    Logger.log('index.htmlのSHA取得エラー: ' + e);
+  }
+
+  const payload = {
+    message: 'index.htmlを更新（NOW自動化）',
+    content: Utilities.base64Encode(html),
+    ...(sha && { sha })
+  };
+
+  const options = {
+    method: 'put',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    headers: {
+      Authorization: 'token ' + githubToken
+    },
+    muteHttpExceptions: true
+  };
+
+  const res = UrlFetchApp.fetch(url, options);
+  Logger.log(`index.html updated: ` + res.getResponseCode());
+}
