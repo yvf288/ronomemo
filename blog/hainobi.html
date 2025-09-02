@@ -1,28 +1,50 @@
-<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<style>body{font-family:sans-serif;margin:8px}table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:4px 6px}input{width:100%;box-sizing:border-box}b{font-size:18px}</style>
+<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+body{font-family:sans-serif;margin:8px}table{border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:4px 6px}input{width:100%;box-sizing:border-box}
+b{font-size:18px}small{color:#666}
+</style>
+
+<div style="margin-bottom:6px">
+  式：<small>=(B1*B2*(1+B6/100)+B7)*(1+B10/100)</small>
+</div>
+
 <table>
-<tr><th>ハイノビ係数</th><td><input id="hn" type="number" step="0.001" value="47.877"></td></tr>
-<tr><th>BASE</th><td><input id="base" type="number" value="262"></td></tr>
-<tr><th>職係数</th><td><input id="job" type="number" step="0.001" value="12543.774"></td></tr>
-<tr><th>素vit</th><td><input id="vit" type="number" value="100"></td></tr>
-<tr><th>補正vit</th><td><input id="add" type="number" value="76"></td></tr>
-<tr><th>vit計</th><td id="vitT"></td></tr>
-<tr><th>固定値</th><td><input id="fix" type="number" value="51100"></td></tr>
-<tr><th>%上昇分</th><td><input id="up" type="number" value="226"></td></tr>
-<tr><th>%ジョンダ</th><td><input id="jd" type="number" value="20"></td></tr>
-<tr><th>%計</th><td id="pctT"></td></tr>
-<tr><th>結果</th><td><b id="res"></b></td></tr>
+<tr><th>ハイノビ係数 (B1)</th><td><input id="b1" type="number" step="0.001" value="47.877"></td></tr>
+<tr><th>BASE (B2)</th><td><input id="b2" type="number" value="262"></td></tr>
+<tr><th>職係数 (B3 = B1×B2)</th><td id="b3"></td></tr>
+
+<tr><th>素vit (B4)</th><td><input id="b4" type="number" value="100"></td></tr>
+<tr><th>補正vit (B5)</th><td><input id="b5" type="number" value="76"></td></tr>
+<tr><th>vit計 (B6 = B4+B5)</th><td id="b6"></td></tr>
+
+<tr><th>固定値 (B7)</th><td><input id="b7" type="number" value="51100"></td></tr>
+<tr><th>%上昇分 (B8)</th><td><input id="b8" type="number" value="226"></td></tr>
+<tr><th>%ジョンダ (B9)</th><td><input id="b9" type="number" value="20"></td></tr>
+<tr><th>%計 (B10 = B8+B9)</th><td id="b10"></td></tr>
+
+<tr><th>結果 (B11)</th><td><b id="b11"></b></td></tr>
 </table>
+
 <script>
-const $=id=>document.getElementById(id), F=n=>Math.round(n).toLocaleString('ja-JP');
+const $=id=>document.getElementById(id);
+const N=v=>+v||0;
+const F0=n=>Math.round(n).toLocaleString('ja-JP');
+const F3=n=>n.toLocaleString('ja-JP',{minimumFractionDigits:3,maximumFractionDigits:3});
+
 function calc(){
-  const hn=+$('hn').value||0, base=+$('base').value||0, job=+$('job').value||0,
-        vit=+$('vit').value||0, add=+$('add').value||0, fix=+$('fix').value||0,
-        up=+$('up').value||0, jd=+$('jd').value||0, vt=vit+add, pct=up+jd,
-        raw=base*job+fix+vt*hn;
-  $('vitT').textContent=F(vt);
-  $('pctT').textContent=pct+' %';
-  $('res').textContent=F(raw*(1+pct/100));
+  const B1=N($('b1').value), B2=N($('b2').value),
+        B4=N($('b4').value), B5=N($('b5').value),
+        B7=N($('b7').value), B8=N($('b8').value), B9=N($('b9').value);
+
+  const B3=B1*B2;        $('b3').textContent = F3(B3);
+  const B6=B4+B5;        $('b6').textContent = F0(B6);
+  const B10=B8+B9;       $('b10').textContent = B10.toLocaleString('ja-JP')+' %';
+
+  const result = (B1*B2*(1+B6/100) + B7) * (1 + B10/100);
+  $('b11').textContent = F0(result);
 }
-document.querySelectorAll('input').forEach(i=>i.oninput=calc); calc();
+
+document.querySelectorAll('input').forEach(el=>el.oninput=calc);
+calc();
 </script>
