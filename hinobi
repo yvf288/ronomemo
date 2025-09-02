@@ -1,0 +1,28 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<style>body{font-family:sans-serif;margin:8px}table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:4px 6px}input{width:100%;box-sizing:border-box}b{font-size:18px}</style>
+<table>
+<tr><th>ハイノビ係数</th><td><input id="hn" type="number" step="0.001" value="47.877"></td></tr>
+<tr><th>BASE</th><td><input id="base" type="number" value="262"></td></tr>
+<tr><th>職係数</th><td><input id="job" type="number" step="0.001" value="12543.774"></td></tr>
+<tr><th>素vit</th><td><input id="vit" type="number" value="100"></td></tr>
+<tr><th>補正vit</th><td><input id="add" type="number" value="76"></td></tr>
+<tr><th>vit計</th><td id="vitT"></td></tr>
+<tr><th>固定値</th><td><input id="fix" type="number" value="51100"></td></tr>
+<tr><th>%上昇分</th><td><input id="up" type="number" value="226"></td></tr>
+<tr><th>%ジョンダ</th><td><input id="jd" type="number" value="20"></td></tr>
+<tr><th>%計</th><td id="pctT"></td></tr>
+<tr><th>結果</th><td><b id="res"></b></td></tr>
+</table>
+<script>
+const $=id=>document.getElementById(id), F=n=>Math.round(n).toLocaleString('ja-JP');
+function calc(){
+  const hn=+$('hn').value||0, base=+$('base').value||0, job=+$('job').value||0,
+        vit=+$('vit').value||0, add=+$('add').value||0, fix=+$('fix').value||0,
+        up=+$('up').value||0, jd=+$('jd').value||0, vt=vit+add, pct=up+jd,
+        raw=base*job+fix+vt*hn;
+  $('vitT').textContent=F(vt);
+  $('pctT').textContent=pct+' %';
+  $('res').textContent=F(raw*(1+pct/100));
+}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc); calc();
+</script>
