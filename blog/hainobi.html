@@ -1,32 +1,39 @@
 <!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1">
 <style>
-body{font-family:sans-serif;margin:4px;font-size:14px;line-height:1.2}
+body{font-family:sans-serif;margin:4px;font-size:14px;line-height:1.15}
 table{border-collapse:collapse}
-th,td{border:1px solid #ccc;padding:3px 4px;vertical-align:middle;white-space:nowrap}
+th,td{border:1px solid #ccc;padding:2px 4px;vertical-align:middle;white-space:nowrap}
 input{width:100%;box-sizing:border-box;padding:2px 3px}
 b{font-size:16px}
 small{color:#666}
 </style>
-
 
 <div style="margin-bottom:6px">
   式：<small>=(B1*B2*(1+B6/100)+B7)*(1+B10/100)</small>
 </div>
 
 <table>
-<tr><th>ハイノビ係数 (B1)</th><td><input id="b1" type="number" step="0.001" value="47.877"></td></tr>
-<tr><th>BASE (B2)</th><td><input id="b2" type="number" value="0"></td></tr>
+<tr><th>ハイノビ係数 (B1)</th><td><input id="b1" type="number" step="0.001" value="47.877" inputmode="decimal"></td></tr>
+<tr><th>BASE (B2)</th><td><input id="b2" type="number" value="262" inputmode="decimal"></td></tr>
 <tr><th>職係数 (B3 = B1×B2)</th><td id="b3"></td></tr>
 
-<tr><th>素vit (B4)</th><td><input id="b4" type="number" value="0"></td></tr>
-<tr><th>補正vit (B5)</th><td><input id="b5" type="number" value="0"></td></tr>
+<tr><th>素vit (B4)</th><td><input id="b4" type="number" value="100" inputmode="decimal"></td></tr>
+<tr><th>補正vit (B5)</th><td><input id="b5" type="number" value="76" inputmode="decimal"></td></tr>
 <tr><th>vit計 (B6 = B4+B5)</th><td id="b6"></td></tr>
 
-<tr><th>固定値 (B7)</th><td><input id="b7" type="number" value="0"></td></tr>
-<tr><th>%上昇分 (B8)</th><td><input id="b8" type="number" value="0"></td></tr>
-<tr><th>%ジョンダ (B9)</th><td><input id="b9" type="number" value="0"></td></tr>
-<tr><th>%計 (B10 = B8+B9)</th><td id="b10"></td></tr>
+<tr><th>固定値 (B7)</th><td><input id="b7" type="number" value="51100" inputmode="decimal"></td></tr>
+<tr><th>%上昇分 (B8)</th><td><input id="b8" type="number" value="226" inputmode="decimal"></td></tr>
 
+<!-- ▼ ジョンダ：チェックでON/OFF、OFFなら0%として計算 -->
+<tr>
+  <th>%ジョンダ (B9)</th>
+  <td>
+    <label style="margin-right:8px"><input id="b9on" type="checkbox" checked> 有効</label>
+    <input id="b9" type="number" value="20" style="width:80px" inputmode="decimal">
+  </td>
+</tr>
+
+<tr><th>%計 (B10 = B8 + B9)</th><td id="b10"></td></tr>
 <tr><th>結果 (B11)</th><td><b id="b11"></b></td></tr>
 </table>
 
@@ -39,7 +46,12 @@ const F3=n=>n.toLocaleString('ja-JP',{minimumFractionDigits:3,maximumFractionDig
 function calc(){
   const B1=N($('b1').value), B2=N($('b2').value),
         B4=N($('b4').value), B5=N($('b5').value),
-        B7=N($('b7').value), B8=N($('b8').value), B9=N($('b9').value);
+        B7=N($('b7').value), B8=N($('b8').value);
+
+  // ジョンダON/OFF
+  const jOn = $('b9on').checked;
+  $('b9').disabled = !jOn;
+  const B9 = jOn ? N($('b9').value) : 0;
 
   const B3=B1*B2;        $('b3').textContent = F3(B3);
   const B6=B4+B5;        $('b6').textContent = F0(B6);
@@ -48,7 +60,6 @@ function calc(){
   const result = (B1*B2*(1+B6/100) + B7) * (1 + B10/100);
   $('b11').textContent = F0(result);
 }
-
 document.querySelectorAll('input').forEach(el=>el.oninput=calc);
 calc();
 </script>
